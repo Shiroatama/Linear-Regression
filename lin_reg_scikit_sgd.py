@@ -61,7 +61,7 @@ def doLinearRegression(column, column_name, alpha_value = None):
     # Print the learned parameters as well as the Mean Squared Error of the model
     # It's worth mentioning that the default parameters or the theta values are both 0
     print(f"Learned parameters: {model.intercept_}, {model.coef_[0]}")
-    print(f"Mean Squared Error: {mean_squared_error(y, y_pred)}")
+    print(f"Mean Squared Error (Cost Function): {mean_squared_error(y, y_pred)}")
 
     # Inverse transform the scaled features to make reading the data easier
     X_test_orig = scaler.inverse_transform(X_scaled)
