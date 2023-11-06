@@ -52,20 +52,37 @@ def doLinearRegression(column, column_name, alpha_value = None):
     #   - alpha_value : float - if no alpha value was given, the default is used.
     #   - max_iter : int - corresponds to the number of loops or iterations the model goes through.
     #   - tol : float - the stopping criterion. It prevents the code from running indefinitely.  
-    model = SGDRegressor(learning_rate='constant', eta0=alpha_value if alpha_value else 0.01, max_iter=10000, tol=1e-3)
-    model.fit(X_scaled, y)
+    
+    model = SGDRegressor(learning_rate='constant', eta0=alpha_value if alpha_value else 0.01, max_iter=1000, tol=1e-3)
 
-    # Predictions are made on the test data which is then used to compare with the training data
-    y_pred = model.predict(X_scaled)
+    # Use this to train the model with a different theta value
+    #coef_theta = np.array([])
+    #intercept_theta = np.array([])
+    #model.fit(X_scaled, y, coef_init=coef_theta, intercept_init=intercept_theta)
+
+    # 10000 iterations will be done part by part for us to be able to look at the state of the cost'
+    costs = []
+    for _ in range(10):
+        model.partial_fit(X_scaled, y)
+        y_pred = model.predict(X_scaled)
+        cost = mean_squared_error(y, y_pred)
+        costs.append(cost)
+
+    plt.plot(costs)
+    plt.xlabel('Iteration')
+    plt.ylabel('Cost')
+    plt.title('Cost over Iterations')
+    plt.show()
 
     # Print the learned parameters as well as the Mean Squared Error of the model
     # It's worth mentioning that the default parameters or the theta values are both 0
-    print(f"Learned parameters: {model.intercept_}, {model.coef_[0]}")
+    print(f"Learned parameters (Thetas): {model.intercept_}, {model.coef_[0]}")
     print(f"Mean Squared Error (Cost Function): {mean_squared_error(y, y_pred)}")
 
     # Inverse transform the scaled features to make reading the data easier
     X_test_orig = scaler.inverse_transform(X_scaled)
 
+    # Predictions are made on the test data which is then used to compare with the training data
     # Plots the models to a graph
     plt.scatter(X_test_orig, y, label=f"{column_name} vs Price")
     plt.plot(X_test_orig, model.predict(X_scaled), label="Learned Hypothesis", color="g")
@@ -84,8 +101,8 @@ def main():
 
     # Perform linear regression
     doLinearRegression(2, "Age of House", 0.002)
-    # doLinearRegression(3, "Distance to Nearest MRT Station", 0.0000008)
-    # doLinearRegression(4, "Number of Nearby Convenience store", 0.07)
+    doLinearRegression(3, "Distance to Nearest MRT Station", 0.0000008)
+    doLinearRegression(4, "Number of Nearby Convenience store", 0.07)
 
 
 if __name__ == "__main__":
